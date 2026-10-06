@@ -22,7 +22,8 @@ jobs:
         with:
           node-version: '22'
       - run: corepack enable && corepack prepare yarn@4.6.0 --activate
-      - run: yarn install --immutable
+      - run: yarn install --mode=skip-builds
+      - run: yarn rebuild
       - run: cp src/config.ts.example src/config.ts && cp src/mikro-orm.config.ts.example src/mikro-orm.config.ts
       - name: Project tests
         run: yarn test --runInBand --json --outputFile=project-tests.json
