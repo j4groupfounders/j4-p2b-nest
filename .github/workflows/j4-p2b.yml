@@ -1,0 +1,47 @@
+name: J4 P2 batch 2 bounded verification
+on:
+  push:
+    branches: ['j4/p2b-*']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: nestjsrealworld
+        ports: ['3307:3306']
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable && corepack prepare yarn@4.6.0 --activate
+      - run: yarn install --immutable
+      - run: cp src/config.ts.example src/config.ts && cp src/mikro-orm.config.ts.example src/mikro-orm.config.ts
+      - name: Project tests
+        run: yarn test --runInBand --json --outputFile=project-tests.json
+      - name: Boot and characterize
+        run: |
+          yarn start > boot.log 2>&1 &
+          python3 j4_probe.py
+      - name: Project E2E tests
+        run: APIURL=http://localhost:3000/api bash e2e/run-api-tests.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidence
+          path: |
+            surface.actual.json
+            project-tests.*
+            boot.log
+            seed-results.json
+            poetry.lock
+            composer.lock
+            yarn.lock
+          retention-days: 30
