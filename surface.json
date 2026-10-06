@@ -1,0 +1,50 @@
+[
+  {
+    "method": "GET",
+    "path": "/",
+    "status": 404,
+    "content_type": "application/json",
+    "sha256": "f130b13d223133142e490f197b87114d9ac2d28920bc446c5a6757366a37c79f",
+    "body": "{\"error\":\"Not Found\",\"message\":\"Cannot GET /\",\"statusCode\":404}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/tags",
+    "status": 200,
+    "content_type": "application/json",
+    "sha256": "b35b1ec1c0c72c4bbd16bd9d6c2cbcac8224272cd7e6ecf504a78f2c7e989b2a",
+    "body": "{\"tags\":[]}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/articles",
+    "status": 200,
+    "content_type": "application/json",
+    "sha256": "e16a3d4e4f6788f0dfbcac33119bf66c17e4a5f59728e79d4c4f30ddfea7ea50",
+    "body": "{\"articles\":[],\"articlesCount\":0}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/user",
+    "status": 401,
+    "content_type": "application/json",
+    "sha256": "97fbe9bd778b828bc170babc6fee5b1d86cf5502296c6c9347ca03fd0a183d3c",
+    "body": "{\"message\":\"Not authorized.\",\"statusCode\":401}"
+  },
+  {
+    "method": "GET",
+    "path": "/j4-missing",
+    "status": 404,
+    "content_type": "application/json",
+    "sha256": "589cbabda8beb296ad6e6c611f0d123b33cd040493838158c4027fd8aa0226a8",
+    "body": "{\"error\":\"Not Found\",\"message\":\"Cannot GET /j4-missing\",\"statusCode\":404}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/users/login",
+    "status": 400,
+    "content_type": "application/json",
+    "sha256": "642fb93d7535ba32ce93b3c611c6fe2dab81d2a510e57963178388437ee12a64",
+    "body": "{\"error\":\"Bad Request\",\"message\":\"No data submitted\",\"statusCode\":400}"
+  }
+]
