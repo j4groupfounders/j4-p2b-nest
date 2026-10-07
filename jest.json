@@ -6,17 +6,13 @@
     "json"
   ],
   "transform": {
-    "^.+\\.[tj]sx?$": [
+    "^.+\\.tsx?$": "ts-jest",
+    "^.+\\.jsx?$": [
       "@swc/jest",
       {
         "jsc": {
           "parser": {
-            "syntax": "typescript",
-            "decorators": true
-          },
-          "transform": {
-            "legacyDecorator": true,
-            "decoratorMetadata": true
+            "syntax": "ecmascript"
           },
           "target": "es2022"
         },
