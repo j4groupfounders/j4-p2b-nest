@@ -7,7 +7,7 @@ def reset():
  if NAME=='symfony':
   for cmd in ['doctrine:schema:drop --force','doctrine:schema:create']:
    subprocess.run(['php','bin/console',*cmd.split()],check=True,stdout=subprocess.DEVNULL)
-def run_http(dest, e2e=False):
+def run_http(dest, e2e=False, strict=True):
  dest=pathlib.Path(dest);dest.mkdir(parents=True,exist_ok=True)
  reset()
  cmd={'nest':['yarn','start'],'fastapi':['poetry','run','uvicorn','app.main:app','--host','127.0.0.1','--port','3000'],'symfony':['php','-d','variables_order=EGPCS','-S','127.0.0.1:3000','-t','public']}[NAME]
@@ -20,13 +20,19 @@ def run_http(dest, e2e=False):
    output=(dest/'probe.log').read_text()
    assert 'BOOT FAILED' not in output and pathlib.Path('surface.actual.json').exists(),'server failed to boot or probe failed'
    (dest/'surface.json').write_text(pathlib.Path('surface.actual.json').read_text())
-   ee=None
+   ee=None;inventory_changed=False
    if e2e:
     with (dest/'e2e.log').open('w') as log3:
      subprocess.run(['npx','--yes','newman@6.2.2','run','e2e/Conduit.postman_collection.json','--delay-request','500','--global-var','APIURL=http://localhost:3000/api','--global-var','USERNAME=j4fixture','--global-var','EMAIL=j4fixture@example.test','--global-var','PASSWORD=practice-password','--reporters','json','--reporter-json-export',str(dest/'e2e.json')],stdout=log3,stderr=subprocess.STDOUT,timeout=120)
     ee=json.loads((dest/'e2e.json').read_text())['run']
-    assert ee['stats']['assertions']['total']==280,'E2E assertion inventory changed'
-   return {'harness_detected':probe.returncode!=0,'e2e_detected':bool(ee and ee['failures']),'e2e_assertions':ee['stats']['assertions'] if ee else None}
+    inventory_changed=ee['stats']['assertions']['total']!=280
+    # During record/replay (strict) a changed assertion total means the harness
+    # itself is broken (chained requests not executing) and must hard-fail.
+    # During seeded-fault injection (strict=False) a mutation breaking request
+    # chaining so fewer assertions run IS a valid detection signal, not a crash.
+    if strict:assert not inventory_changed,'E2E assertion inventory changed'
+   e2e_detected=bool(ee and (ee['failures'] or inventory_changed))
+   return {'harness_detected':probe.returncode!=0,'e2e_detected':e2e_detected,'e2e_assertions':ee['stats']['assertions'] if ee else None}
  finally:
   if server:
    try:os.killpg(server.pid,signal.SIGTERM)

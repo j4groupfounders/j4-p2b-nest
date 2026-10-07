@@ -22,7 +22,7 @@ for name,file,old,new in json.loads(pathlib.Path('j4_mutations.json').read_text(
    tree=ET.parse(dest/'tests.xml');assert len(tree.findall('.//testcase'))==config['test_count'],'test inventory changed'
    failures=len(tree.findall('.//failure'));errors=len(tree.findall('.//error'));assert errors==0,'test infrastructure/runtime error; do not score as detection'
   assert test.returncode==0 or failures>0,'non-assertion test failure; do not score as detection'
-  http=run_http(dest,NAME=='nest')
+  http=run_http(dest,NAME=='nest',strict=False)
   assert http['harness_detected'],'mutation must change measured HTTP surface'
   results.append({'fault':name,'project_detected':failures>0 or http['e2e_detected'],'project_test_failures':failures,**http})
   pathlib.Path('seed-results.json').write_text(json.dumps(results,indent=2))
