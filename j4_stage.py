@@ -23,7 +23,7 @@ def run_http(dest, e2e=False):
    ee=None
    if e2e:
     with (dest/'e2e.log').open('w') as log3:
-     subprocess.run(['npx','--yes','newman@6.2.2','run','e2e/Conduit.postman_collection.json','--delay-request','0','--global-var','APIURL=http://localhost:3000/api','--global-var','USERNAME=j4fixture','--global-var','EMAIL=j4fixture@example.test','--global-var','PASSWORD=practice-password','--reporters','json','--reporter-json-export',str(dest/'e2e.json')],stdout=log3,stderr=subprocess.STDOUT,timeout=120)
+     subprocess.run(['npx','--yes','newman@6.2.2','run','e2e/Conduit.postman_collection.json','--delay-request','500','--global-var','APIURL=http://localhost:3000/api','--global-var','USERNAME=j4fixture','--global-var','EMAIL=j4fixture@example.test','--global-var','PASSWORD=practice-password','--reporters','json','--reporter-json-export',str(dest/'e2e.json')],stdout=log3,stderr=subprocess.STDOUT,timeout=120)
     ee=json.loads((dest/'e2e.json').read_text())['run']
     assert ee['stats']['assertions']['total']==280,'E2E assertion inventory changed'
    return {'harness_detected':probe.returncode!=0,'e2e_detected':bool(ee and ee['failures']),'e2e_assertions':ee['stats']['assertions'] if ee else None}
