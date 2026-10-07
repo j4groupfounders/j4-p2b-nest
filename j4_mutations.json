@@ -1,0 +1,32 @@
+[
+  [
+    "tags-status",
+    "src/tag/tag.controller.ts",
+    "  @Get()",
+    "  @Get()\n  @HttpCode(201)"
+  ],
+  [
+    "article-count",
+    "src/article/article.service.ts",
+    "return { articles: articles.map(a => a.toJSON(user)), articlesCount };",
+    "return { articles: articles.map(a => a.toJSON(user)), articlesCount: Number(articlesCount) + 1 };"
+  ],
+  [
+    "auth-status",
+    "src/user/auth.middleware.ts",
+    "throw new HttpException('Not authorized.', HttpStatus.UNAUTHORIZED);",
+    "throw new HttpException('Not authorized.', HttpStatus.FORBIDDEN);"
+  ],
+  [
+    "missing-route-status",
+    "src/main.ts",
+    "  await app.listen(3000);",
+    "  app.getHttpAdapter().getInstance().get('/j4-missing', (_req: unknown, res: any) => res.status(200).json({}));\n  await app.listen(3000);"
+  ],
+  [
+    "login-status",
+    "src/shared/pipes/validation.pipe.ts",
+    "throw new BadRequestException('No data submitted');",
+    "throw new HttpException('No data submitted', 422);"
+  ]
+]

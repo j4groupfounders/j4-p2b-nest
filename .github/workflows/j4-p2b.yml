@@ -26,12 +26,10 @@ jobs:
       - run: cp src/config.ts.example src/config.ts && cp src/mikro-orm.config.ts.example src/mikro-orm.config.ts
       - name: Project tests
         run: yarn test --runInBand --json --outputFile=project-tests.json
-      - name: Boot and characterize
-        run: |
-          yarn start > boot.log 2>&1 &
-          python3 j4_probe.py
-      - name: Project E2E tests
-        run: APIURL=http://localhost:3000/api bash e2e/run-api-tests.sh
+      - name: Boot, frozen replay and project E2E
+        run: python3 j4_stage.py
+      - name: Independent preregistered seeded faults
+        run: python3 j4_seeds.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -41,6 +39,8 @@ jobs:
             project-tests.*
             boot.log
             seed-results.json
+            seed-evidence/
+            http-evidence/
             poetry.lock
             composer.lock
             yarn.lock
